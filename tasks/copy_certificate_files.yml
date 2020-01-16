@@ -1,0 +1,20 @@
+---
+- name: Copy certificate files key and pem
+  copy:
+    src: "{{ item }}"
+    dest: /etc/pki/tls/private/
+  loop:
+    - "{{ haproxy_key_file }}"
+    - "{{ haproxy_pem_file }}"
+#
+- name: Copy certificate file crt
+  copy:
+    src: "{{ haproxy_crt_file }}"
+    dest: /etc/pki/tls/certs/
+#
+- name: Copy certificate file pem for Debian
+  copy:
+    src: "{{ haproxy_pem_file }}"
+    dest: /etc/ssl/certs/
+  when: ansible_os_family == 'Debian'
+...

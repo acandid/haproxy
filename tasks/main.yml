@@ -1,0 +1,11 @@
+---
+# tasks file for haproxy
+- name: Install HAProxy 
+  import_tasks: install_haproxy.yml
+#
+- name: Create config file
+  import_tasks: create_config_file.yml
+#
+- name: Copy certificate files
+  import_tasks: copy_certificate_files.yml
+...

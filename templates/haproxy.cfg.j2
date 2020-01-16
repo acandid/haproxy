@@ -1,0 +1,45 @@
+global
+    log		127.0.0.1 local2
+{% if haproxy_chroot != '' %}
+    chroot      {{ haproxy_chroot }}
+{% endif %}
+{% if haproxy_pidfile != '' %}
+    pidfile     {{ haproxy_pidfile }}
+{% endif %}
+{% if haproxy_socket != '' %}
+    stats socket {{ haproxy_socket }}
+{% endif %}
+    user        {{ haproxy_user }}
+    group       {{ haproxy_group }}
+    daemon
+    maxconn     4000
+    stats timeout 30s
+    # Default SSL material locations
+{% for ssl_vars in haproxy_ssl %}
+    {{ ssl_vars }}
+{% endfor %}
+
+defaults
+{% for defaults_vars in haproxy_defaults %}
+    {{ defaults_vars }}
+{% endfor %}
+
+frontend {{ haproxy_frontend_https_name }}
+    bind {{ haproxy_bind_address }}:{{ haproxy_frontend_ssl_port }} ssl crt /etc/pki/tls/private/{{ haproxy_pem_file }} ca-file /etc/pki/tls/certs/{{ haproxy_crt_file }}
+    mode {{ haproxy_frontend_mode }}
+    option httpclose
+    option forwardfor
+    reqadd X-Forwarded-Proto:\ https
+    # To auto redirect http to https
+    redirect scheme https if !{ ssl_fc }
+
+    default_backend {{ haproxy_backend_name }}
+
+backend {{ haproxy_backend_name }}
+    mode {{ haproxy_frontend_mode }}
+    balance {{ haproxy_balance }}
+    option forwardfor
+    option tcp-check
+{% for servers in haproxy_backend_servers %}
+    server {{ servers.name }} {{ servers.address }} check maxconn 1000
+{% endfor %}

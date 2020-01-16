@@ -1,0 +1,65 @@
+---
+# defaults file for haproxy
+#
+# Global variables
+#
+haproxy_chroot: /var/lib/haproxy
+haproxy_pidfile: /var/run/haproxy.pid
+haproxy_socket: /var/lib/haproxy/stats
+haproxy_user: haproxy
+haproxy_group: haproxy
+haproxy_ssl:
+  - ca-base /etc/pki/tls/certs
+  - crt-base /etc/pki/tls/private
+  - ssl-default-bind-ciphers EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
+  - tune.ssl.default-dh-param 2048
+#
+# Defaults variables
+haproxy_defaults:
+  - mode                    http
+  - log                     global
+  - option                  httplog
+  - option                  dontlognull
+  - option                  http-server-close
+  - option forwardfor       except 127.0.0.0/8
+  - option                  redispatch
+  - option                  httpclose
+  - option                  persist
+  - retries                 3
+  - timeout http-request    10s
+  - timeout queue           1m
+  - timeout connect         10s
+  - timeout client          1m
+  - timeout server          1m
+  - timeout http-keep-alive 10s
+  - timeout check           10s
+  - maxconn                 2000
+  - hash-type               consistent
+  - stats                   enable
+  - stats uri               /stats
+  - stats refresh           3
+  - stats auth              admin:password   #inform user and password for haproxy dashboard
+  - stats                   hide-version
+  - stats realm             Statistics
+#
+# HTTP frontend settings
+haproxy_bind_address: '*'
+haproxy_frontend_mode: 'http'
+#
+# HTTPS frontend settings  
+haproxy_frontend_https_name: www_https
+haproxy_frontend_ssl_port: 443
+#
+# Backend settings
+haproxy_backend_name: web_service
+haproxy_balance: roundrobin
+haproxy_backend_servers:
+  - name: webserver_1
+    address: ip:80
+  - name: webserver_2
+    address: ip:80
+#
+# Certificate
+haproxy_pem_file: example.com.pem
+haproxy_crt_file: example.com.crt
+haproxy_key_file: example.com.key

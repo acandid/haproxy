@@ -1,0 +1,12 @@
+---
+- name: Install haproxy package
+  yum:
+    name: "{{ haproxy_package }}"
+    state: latest
+#
+- name: Instal haproxy package for Debian
+  apt:
+    name: "{{ haproxy_package }}"
+    state: latest
+  when: ansible_os_family == 'Debian'
+...

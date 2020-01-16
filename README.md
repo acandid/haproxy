@@ -73,8 +73,11 @@ E.g. you have a server key example.com.key and certificate file example.com.key.
 
 .
 └── files
+
     ├── example.com.crt
+    
     └── example.com.key
+    
     |__ example.com.pem
 
 
